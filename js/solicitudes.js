@@ -3,22 +3,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnEnviar = document.getElementById('btn-enviar');
     const mensajeEstado = document.getElementById('mensaje-estado');
 
-    // 1. Escuchar la respuesta del iframe (por si acaso Google lo permite)
-    window.addEventListener('message', (event) => {
-        if (event.data === 'FORM_OK') {
-            finalizarEnvioExitoso();
-        }
-    });
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    // 2. Interceptar el envío del formulario
-    form.addEventListener('submit', (e) => {
-        e.preventDefault(); 
-
+        // Bloquear botón y mostrar estado
         btnEnviar.disabled = true;
         btnEnviar.textContent = 'Enviando...';
         mensajeEstado.style.display = 'none';
 
-        // OJO: Usamos 'correo' porque así está en tu index.html
         const payload = {
             tipo_formulario: "solicitud_acceso",
             timestamp: new Date().toISOString(),
@@ -28,42 +20,30 @@ document.addEventListener('DOMContentLoaded', () => {
             justificacion: document.getElementById('justificacion').value.trim()
         };
 
-        const tempForm = document.createElement('form');
-        tempForm.method = 'POST';
-        tempForm.action = ENV.APPS_SCRIPT_URL;
-        tempForm.target = 'hidden_iframe';
+        try {
+            // ENVIAR DATOS CON FETCH
+            // Usamos mode: 'no-cors' porque Apps Script no devuelve cabeceras CORS dinámicas fácilmente
+            await fetch(ENV.APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Esto evita el error de "Bloqueado por CORS"
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-        const inputPayload = document.createElement('input');
-        inputPayload.type = 'hidden';
-        inputPayload.name = 'payload';
-        inputPayload.value = JSON.stringify(payload);
+            // Con 'no-cors' no podemos leer la respuesta, pero si no saltó al 'catch',
+            // significa que la petición salió hacia Google exitosamente.
+            mostrarMensaje('✅ Solicitud enviada con éxito. El responsable ha sido notificado.', 'success');
+            form.reset();
 
-        tempForm.appendChild(inputPayload);
-        document.body.appendChild(tempForm);
-
-        // 3. ENVIAR
-        tempForm.submit();
-        document.body.removeChild(tempForm);
-
-        // 4. ÉXITO PREVENTIVO (Como el iframe suele fallar en responder por CORS/X-Frame)
-        // Le damos 2.5 segundos de espera y forzamos el éxito visual
-        setTimeout(() => {
-            if (btnEnviar.disabled) { // Si aún sigue en estado "Enviando..."
-                finalizarEnvioExitoso();
-            }
-        }, 2500);
+        } catch (error) {
+            console.error('Error al enviar:', error);
+            mostrarMensaje('❌ Hubo un problema al conectar con el servidor. Intenta de nuevo.', 'error');
+        } finally {
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = 'Enviar Solicitud';
+        }
     });
-
-    function finalizarEnvioExitoso() {
-        mostrarMensaje('✅ Solicitud enviada con éxito. El responsable ha sido notificado.', 'success');
-        form.reset();
-        
-        // Pequeño truco para limpiar los campos readonly autocompletados si es necesario
-        // document.getElementById('nombreUsuario').value = "..."; 
-        
-        btnEnviar.disabled = false;
-        btnEnviar.textContent = 'Enviar Solicitud';
-    }
 
     function mostrarMensaje(texto, tipo) {
         mensajeEstado.textContent = texto;
