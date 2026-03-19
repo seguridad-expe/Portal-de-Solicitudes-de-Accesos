@@ -46,7 +46,7 @@ const Auth = (() => {
     document.getElementById('loginError').style.display = 'none';
     _resetBtn();
 
-    const correoInput = document.getElementById('correo');
+    const correoInput = document.getElementById('correoUsuario');
     if (correoInput) {
       correoInput.value = '';
       correoInput.readOnly = false;
