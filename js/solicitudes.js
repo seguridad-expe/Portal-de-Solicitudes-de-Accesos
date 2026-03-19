@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tipo_formulario: "solicitud_acceso",
             timestamp: new Date().toISOString(),
             nombre: document.getElementById('nombreUsuario').value.trim(),
-            correo: document.getElementById('correo').value.trim(),
+            correo: document.getElementById('correoUsuario').value.trim(),
             aplicativo: document.getElementById('selectAplicativo').value,
             justificacion: document.getElementById('justificacion').value.trim()
         };
