@@ -69,7 +69,7 @@ const Auth = (() => {
 
     State.googleUser = profile;
     // Pre-llenar correo y bloquearlo
-    const correoInput = document.getElementById('correo');
+    const correoInput = document.getElementById('correoUsuario');
     if (correoInput) {
       correoInput.value = email;
       correoInput.readOnly = true;
