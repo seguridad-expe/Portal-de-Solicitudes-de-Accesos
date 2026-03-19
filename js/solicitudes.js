@@ -2,21 +2,42 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("form-solicitud");
   const btnEnviar = document.getElementById("btn-enviar");
   const mensajeEstado = document.getElementById("mensaje-estado");
+  const selectApp = document.getElementById("selectAplicativo");
+  const grupoOtro = document.getElementById("grupo-otro-aplicativo");
+  const inputOtro = document.getElementById("otroAplicativo");
 
+  // --- Lógica Visual: Mostrar/Ocultar campo "Otro" ---
+  selectApp.addEventListener("change", () => {
+    if (selectApp.value === "Otro") {
+      grupoOtro.style.display = "block";
+      inputOtro.required = true;
+    } else {
+      grupoOtro.style.display = "none";
+      inputOtro.required = false;
+      inputOtro.value = "";
+    }
+  });
+
+  // --- Lógica de Envío ---
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Bloquear botón y mostrar estado
     btnEnviar.disabled = true;
     btnEnviar.textContent = "Enviando...";
     mensajeEstado.style.display = "none";
+
+    // Determinamos el nombre del aplicativo final
+    const aplicativoSeleccionado = selectApp.value;
+    const aplicativoFinal = (aplicativoSeleccionado === "Otro") 
+      ? `Otro: ${inputOtro.value.trim()}` 
+      : aplicativoSeleccionado;
 
     const payload = {
       tipo_formulario: "solicitud_acceso",
       timestamp: new Date().toISOString(),
       nombre: document.getElementById("nombreUsuario").value.trim(),
       correo: document.getElementById("correoUsuario").value.trim(),
-      aplicativo: document.getElementById("selectAplicativo").value,
+      aplicativo: aplicativoFinal, // Enviamos el valor procesado
       justificacion: document.getElementById("justificacion").value.trim(),
     };
 
@@ -36,14 +57,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       mostrarMensaje(
         "✅ Solicitud enviada con éxito. El responsable ha sido notificado.",
-        "success",
+        "success"
       );
+      
       form.reset();
+      grupoOtro.style.display = "none"; // Ocultar el campo extra tras el reset
+
     } catch (error) {
       console.error("Error al enviar:", error);
       mostrarMensaje(
         "❌ Hubo un problema al conectar con el servidor. Intenta de nuevo.",
-        "error",
+        "error"
       );
     } finally {
       btnEnviar.disabled = false;
