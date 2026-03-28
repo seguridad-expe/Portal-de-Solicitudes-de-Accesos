@@ -32,14 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
       ? `Otro: ${inputOtro.value.trim()}` 
       : aplicativoSeleccionado;
 
-    const payload = {
-      tipo_formulario: "solicitud_acceso",
-      timestamp: new Date().toISOString(),
-      nombre: document.getElementById("nombreUsuario").value.trim(),
-      correo: document.getElementById("correoUsuario").value.trim(),
-      aplicativo: aplicativoFinal, // Enviamos el valor procesado
-      justificacion: document.getElementById("justificacion").value.trim(),
-    };
+ const payload = {
+    tipo_formulario: "solicitud_acceso",
+    timestamp: new Date().toISOString(),
+    nombre: document.getElementById("nombreUsuario").value.trim(),
+    correo: document.getElementById("correoUsuario").value.trim(),
+    
+    // NUEVOS CAMPOS ENVIADOS AL SCRIPT
+    tipo_acceso: document.getElementById("tipoAcceso").value,
+    cliente_nombre: document.getElementById("clienteNombre").value.trim(),
+    correo_responsable_manual: inputCorreoManual.value.trim(),
+    
+    // Mantenemos tu lógica de aplicativo final
+    aplicativo: (selectApp.value === "Otro") ? inputOtro.value.trim() : selectApp.value,
+    justificacion: document.getElementById("justificacion").value.trim(),
+};
 
     try {
       const formData = new URLSearchParams();
