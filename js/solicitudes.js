@@ -3,18 +3,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnEnviar = document.getElementById("btn-enviar");
   const mensajeEstado = document.getElementById("mensaje-estado");
   const selectApp = document.getElementById("selectAplicativo");
+  
+  // Elementos para la opción "Otro"
   const grupoOtro = document.getElementById("grupo-otro-aplicativo");
   const inputOtro = document.getElementById("otroAplicativo");
+  
+  // Elementos para el correo del responsable (Nuevo)
+  const grupoCorreo = document.getElementById("grupo-correo-responsable");
+  const inputCorreoManual = document.getElementById("correoResponsableManual");
 
-  // --- Lógica Visual: Mostrar/Ocultar campo "Otro" ---
+  // --- Lógica Visual: Mostrar/Ocultar campos al seleccionar "Otro" ---
   selectApp.addEventListener("change", () => {
     if (selectApp.value === "Otro") {
+      // Mostramos el campo para escribir la App y el campo del Correo
       grupoOtro.style.display = "block";
+      grupoCorreo.style.display = "block"; 
+      
+      // Los volvemos obligatorios
       inputOtro.required = true;
+      inputCorreoManual.required = true;
     } else {
+      // Ocultamos ambos campos
       grupoOtro.style.display = "none";
+      grupoCorreo.style.display = "none";
+      
+      // Quitamos la obligatoriedad y limpiamos lo que hayan escrito
       inputOtro.required = false;
+      inputCorreoManual.required = false;
       inputOtro.value = "";
+      inputCorreoManual.value = "";
     }
   });
 
@@ -32,21 +49,21 @@ document.addEventListener("DOMContentLoaded", () => {
       ? `Otro: ${inputOtro.value.trim()}` 
       : aplicativoSeleccionado;
 
- const payload = {
-    tipo_formulario: "solicitud_acceso",
-    timestamp: new Date().toISOString(),
-    nombre: document.getElementById("nombreUsuario").value.trim(),
-    correo: document.getElementById("correoUsuario").value.trim(),
-    
-    // NUEVOS CAMPOS ENVIADOS AL SCRIPT
-    tipo_acceso: document.getElementById("tipoAcceso").value,
-    cliente_nombre: document.getElementById("clienteNombre").value.trim(),
-    correo_responsable_manual: inputCorreoManual.value.trim(),
-    
-    // Mantenemos tu lógica de aplicativo final
-    aplicativo: (selectApp.value === "Otro") ? inputOtro.value.trim() : selectApp.value,
-    justificacion: document.getElementById("justificacion").value.trim(),
-};
+    // Construimos el paquete de datos (Payload) con TODOS los campos nuevos
+    const payload = {
+      tipo_formulario: "solicitud_acceso",
+      timestamp: new Date().toISOString(),
+      nombre: document.getElementById("nombreUsuario").value.trim(),
+      correo: document.getElementById("correoUsuario").value.trim(),
+      
+      // Nuevos campos para la política de 2026
+      tipo_acceso: document.getElementById("tipoAcceso").value,
+      cliente_nombre: document.getElementById("clienteNombre").value.trim(),
+      correo_responsable_manual: inputCorreoManual.value.trim(),
+      
+      aplicativo: aplicativoFinal,
+      justificacion: document.getElementById("justificacion").value.trim(),
+    };
 
     try {
       const formData = new URLSearchParams();
@@ -67,8 +84,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "success"
       );
       
+      // Reseteamos el formulario y volvemos a ocultar los campos condicionales
       form.reset();
-      grupoOtro.style.display = "none"; // Ocultar el campo extra tras el reset
+      grupoOtro.style.display = "none";
+      grupoCorreo.style.display = "none";
 
     } catch (error) {
       console.error("Error al enviar:", error);
