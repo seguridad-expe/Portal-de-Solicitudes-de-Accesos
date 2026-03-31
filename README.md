@@ -27,12 +27,5 @@ El "cerebro" del proyecto reside en un script vinculado al Sheets que:
 * Recibe los datos vía `POST`.
 * Crea automáticamente pestañas y encabezados con estilos corporativos.
 * Mapea el aplicativo solicitado con su responsable correspondiente para el envío de alertas.
-
-## 🚀 Próximos Pasos (Adopción Oficial)
-Si se aprueba el uso de esta herramienta, el camino a producción es:
-1.  **Clonar** este repositorio en una cuenta institucional de GitHub.
-2.  **Migrar** el Apps Script a una cuenta genérica (ej: `it-admin@experimentality.co`) para oficializar el remitente de los correos.
-3.  **Actualizar** los "Secrets" en la nueva ubicación de GitHub.
-
 ---
 *Desarrollado como solución interna para el Comité de Seguridad de Experimentality.*
